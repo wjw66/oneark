@@ -1,0 +1,361 @@
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: #202020;
+  background: #fafafa;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --surface: #ffffff;
+  --border: #ededed;
+  --muted: #737373;
+  --focus: #a9c7ff;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button {
+  font: inherit;
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.app-header {
+  height: 72px;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand strong {
+  font-size: 20px;
+  font-weight: 650;
+  letter-spacing: -0.7px;
+}
+.header-caption {
+  font-size: 13px;
+  color: var(--muted);
+}
+main {
+  width: min(100%, 1000px);
+  margin: 0 auto;
+  padding: 28px 36px 24px;
+  flex: 1;
+}
+.document-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #898989;
+  font-size: 13px;
+}
+.breadcrumb h1 {
+  font: inherit;
+  color: #3a3a3a;
+  margin: 0;
+}
+.document-state {
+  font-size: 12px;
+  color: var(--muted);
+}
+.workspace {
+  background: var(--surface);
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.workspace:focus-within {
+  border-color: var(--focus);
+}
+.format-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.format-tools {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.format-tools button {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+.format-tools button[aria-label='加粗'] {
+  font-weight: 750;
+  font-size: 15px;
+}
+.format-tools button[aria-label='斜体'] {
+  font-style: italic;
+  font-size: 15px;
+}
+.format-tools button:hover:not(:disabled),
+.export-button:hover,
+.runtime-button:hover {
+  background: #f3f3f3;
+}
+.format-tools button[aria-pressed='true'] {
+  background: #ebebeb;
+  color: #111;
+}
+.tool-separator {
+  width: 1px;
+  height: 16px;
+  background: #e6e6e6;
+  margin: 0 6px;
+}
+.export-button {
+  border: 1px solid #e3e3e3;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.editor-canvas {
+  padding: 40px clamp(24px, 5vw, 64px) 52px;
+}
+.tiptap {
+  min-height: 480px;
+  outline: none;
+  font-size: 15px;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+.tiptap > :first-child {
+  margin-top: 0;
+}
+.tiptap h1 {
+  font-size: 30px;
+  line-height: 1.4;
+  font-weight: 650;
+  letter-spacing: -0.8px;
+  margin: 0 0 22px;
+}
+.tiptap h2 {
+  font-size: 20px;
+  line-height: 1.5;
+  font-weight: 600;
+  margin: 28px 0 12px;
+}
+.tiptap h3 {
+  font-size: 17px;
+  line-height: 1.5;
+  margin: 24px 0 12px;
+}
+.tiptap p {
+  margin: 12px 0;
+}
+.tiptap ul,
+.tiptap ol {
+  padding-left: 24px;
+  margin: 12px 0;
+}
+.tiptap li p {
+  margin: 4px 0;
+}
+.tiptap blockquote {
+  border-left: 3px solid #dedede;
+  margin: 24px 0;
+  padding: 1px 20px;
+  color: #737373;
+}
+.tiptap blockquote p {
+  margin: 8px 0;
+}
+.tiptap strong {
+  font-weight: 650;
+}
+.tiptap a {
+  color: #3d67a8;
+  text-decoration: underline;
+}
+.tiptap code {
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: #f4f4f4;
+  font-size: 0.9em;
+}
+.tiptap pre {
+  background: #f6f6f6;
+  padding: 16px 20px;
+  border-radius: 8px;
+  overflow: auto;
+}
+.tiptap pre code {
+  padding: 0;
+  background: transparent;
+}
+.tiptap table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+  margin: 20px 0;
+  font-size: 14px;
+}
+.tiptap td,
+.tiptap th {
+  padding: 10px 14px;
+  border: 1px solid #e7e7e7;
+  vertical-align: top;
+  position: relative;
+}
+.tiptap th {
+  background: #f8f8f8;
+  font-weight: 600;
+  text-align: left;
+}
+.tiptap td p,
+.tiptap th p {
+  margin: 0;
+}
+.tiptap .selectedCell {
+  background: #eef4ff;
+}
+.tiptap ul[data-type='taskList'] {
+  list-style: none;
+  padding: 0;
+}
+.tiptap li[data-checked] {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.tiptap li[data-checked] > label {
+  margin-top: 5px;
+  flex: 0 0 auto;
+}
+.tiptap li[data-checked] > div {
+  flex: 1;
+  min-width: 0;
+}
+.tiptap li[data-checked] p {
+  margin: 0;
+}
+.tiptap input[type='checkbox'] {
+  accent-color: #333;
+  cursor: pointer;
+}
+.tiptap hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 24px 0;
+}
+.tiptap ::selection {
+  background: #dce8ff;
+}
+.document-hint {
+  margin: 14px 4px 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+footer {
+  padding: 14px 32px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.runtime {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.status::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: #8c8c8c;
+  vertical-align: middle;
+}
+.status.error {
+  color: #b43e3e;
+}
+.runtime-button {
+  padding: 5px 7px;
+  border-radius: 5px;
+  font-size: 11px;
+}
+@media (max-width: 800px) {
+  .app-header {
+    padding-inline: 20px;
+  }
+  main {
+    padding: 24px 20px;
+  }
+  .format-bar {
+    padding: 8px;
+    gap: 8px;
+  }
+  .format-tools {
+    gap: 0;
+  }
+  .format-tools button {
+    padding-inline: 6px;
+  }
+  .editor-canvas {
+    padding: 28px 24px 36px;
+  }
+  footer {
+    padding-inline: 20px;
+    flex-wrap: wrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+.editor-error {
+  margin: 12px 24px;
+  color: #b43e3e;
+  font-size: 13px;
+}

@@ -1,0 +1,41 @@
+name: 检查与打包
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            package: package:mac
+          - os: windows-latest
+            package: package:win
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - run: npm ci
+      - run: npm run check
+      - run: npm run ${{ matrix.package }}
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - run: npm run smoke:packaged
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OneArk-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            dist/*.dmg
+            dist/*.zip
+            dist/*.exe
+            test-results/*.png
+          if-no-files-found: error

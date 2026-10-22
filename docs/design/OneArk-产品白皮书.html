@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OneArk · 个人资产沉淀系统 — 产品白皮书</title>
+<style>
+:root{
+  --night:#13120F; --night2:#1D1B17; --paper:#F4F0E8; --card:#FFFDF8; --ink:#1A1915; --ink2:#4A463E; --mute:#8C867A;
+  --line:#E0D9CC; --line2:#ECE6DA;
+  --acc:#C2461C; --acc2:#E8693A; --acc-soft:#F6E3D8;
+  --ok:#2A6E5F; --ok2:#3FA088; --ok-soft:#DCEDE7;
+  --gold:#C08A24; --gold-soft:#F6EBD2;
+  --serif:"Noto Serif SC","Source Han Serif SC","Songti SC",Georgia,serif;
+  --sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --w:1240px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{font-family:var(--sans);color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased;line-height:1.6}
+.wrap{max-width:var(--w);margin:0 auto;padding:0 40px}
+b{font-weight:700}
+.mono{font-family:var(--mono)}
+.k{font-family:var(--mono);font-size:12px;letter-spacing:.16em;color:var(--mute);text-transform:uppercase}
+.serif{font-family:var(--serif)}
+.acc{color:var(--acc)} .okc{color:var(--ok)} .goldc{color:var(--gold)} .muted{color:var(--mute)}
+::selection{background:var(--acc);color:#fff}
+
+/* ===== progress + floating nav ===== */
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--acc),var(--gold));z-index:60}
+nav.top{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:center;transition:transform .35s;transform:translateY(-110%);pointer-events:none}
+nav.top.show{transform:none}
+nav.top .in{pointer-events:auto;display:flex;gap:4px;align-items:center;margin-top:12px;background:rgba(19,18,15,.84);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:6px;max-width:calc(100vw - 32px);overflow-x:auto;scrollbar-width:none}
+nav.top .in::-webkit-scrollbar{display:none}
+nav.top a{color:#BDB5A6;text-decoration:none;font-size:13px;padding:7px 13px;border-radius:999px;transition:.2s;white-space:nowrap}
+nav.top a .n{font-family:var(--mono);font-size:10.5px;margin-right:6px;opacity:.6}
+nav.top a.on{background:var(--acc);color:#fff}
+nav.top a:hover:not(.on){color:#fff}
+
+/* ===== reveal ===== */
+.rv{opacity:0;transform:translateY(36px);transition:opacity 1.1s cubic-bezier(.2,.7,.2,1),transform 1.1s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+.rv.d1{transition-delay:.16s}.rv.d2{transition-delay:.32s}.rv.d3{transition-delay:.48s}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}*{animation:none!important}}
+
+/* ===== hero ===== */
+.hero{position:relative;min-height:100vh;background:var(--night);color:#F1ECE2;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:120px 0 0}
+.hero .grid-bg{position:absolute;inset:0;background:
+  radial-gradient(900px 500px at 78% 30%,rgba(232,105,58,.16),transparent 68%),
+  radial-gradient(800px 460px at 12% 78%,rgba(192,138,36,.1),transparent 70%),
+  repeating-linear-gradient(90deg,rgba(244,238,227,.045) 0 1px,transparent 1px 96px),
+  repeating-linear-gradient(0deg,rgba(244,238,227,.03) 0 1px,transparent 1px 96px);
+  pointer-events:none}
+#stars{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.hero .wrap{position:relative;z-index:2}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.34fr) minmax(300px,.66fr);gap:36px;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;color:#A9A192;text-transform:uppercase}
+.eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--acc2);box-shadow:0 0 0 4px rgba(232,105,58,.16);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.4}}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(46px,6.6vw,84px);line-height:1.02;letter-spacing:-.015em;margin-top:22px;max-width:760px}
+.hero h1 .g{background:linear-gradient(94deg,#E8693A 8%,#E0A84A 55%,#F1ECE2 105%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.hero .sub{max-width:640px;color:#BDB5A6;font-size:16.5px;line-height:1.85;margin-top:24px}
+.hero .sub b{color:#F1ECE2}
+.hero .meta{display:flex;flex-wrap:wrap;gap:16px 44px;margin-top:38px;padding-top:22px;border-top:1px solid rgba(255,255,255,.1);max-width:720px}
+.hero .meta div{font-size:12.5px;color:#8C867A;display:flex;flex-direction:column;gap:3px}
+.hero .meta b{font-family:var(--serif);font-size:20px;color:#F1ECE2;font-weight:600;line-height:1.2}
+.hero-art{position:relative;width:100%;max-width:400px;justify-self:end;z-index:1}
+.hero-art svg{width:100%;height:auto;display:block}
+.gauge-num{font-family:var(--mono);fill:#F1ECE2}
+.hero-art .hstat{display:flex;flex-direction:column;gap:8px;margin-top:8px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)}
+.hero-art .hstat div{display:flex;align-items:center;gap:9px;font-size:12px;color:#8C867A}
+.hero-art .hstat .d{width:7px;height:7px;border-radius:50%;flex:none}
+.hero-art .hstat .d.acc{background:var(--acc2)}.hero-art .hstat .d.ok{background:var(--ok2)}.hero-art .hstat .d.gold{background:var(--gold)}
+.hero-art .hstat b{font-family:var(--mono);color:#F1ECE2;font-size:12.5px}
+.hero-art .hstat em{font-style:normal;margin-left:auto;font-family:var(--mono);font-size:10.5px;color:#6E685D}
+
+/* north strip */
+.north{position:relative;z-index:2;margin-top:60px;border-top:1px solid rgba(255,255,255,.1);background:rgba(13,12,10,.35)}
+.north .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.north .it{padding:22px 26px 24px;border-left:1px solid rgba(255,255,255,.07)}
+.north .it:first-child{border-left:none;padding-left:0}
+.north .lab{display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:#8C867A;text-transform:uppercase}
+.north .val{display:flex;align-items:baseline;gap:8px;margin-top:8px;flex-wrap:wrap}
+.north .val .now{font-family:var(--serif);font-size:30px;font-weight:900;line-height:1;color:#F1ECE2}
+.north .val .to{font-size:11.5px;color:#8C867A}
+.north .val .tgt{font-family:var(--mono);font-size:17px;font-weight:700;color:#E8693A}
+.north .trk{height:3px;border-radius:2px;background:rgba(255,255,255,.1);margin-top:12px;overflow:hidden}
+.north .trk i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--gold));transition:width 1.8s cubic-bezier(.2,.7,.2,1) .3s}
+
+/* ===== sections ===== */
+.sec{padding:104px 0}
+.sec+.sec{padding-top:0}
+.sec.night{background:var(--night);color:#F1ECE2}
+.sec.night .sh .no{color:rgba(244,238,227,.14)}
+.sec.night .sh h2,.sec.night .sh .lede{color:#F1ECE2}
+.sec.night .sh .lede{color:#BDB5A6}
+.sec.night .sub-h{border-color:rgba(255,255,255,.12)}
+.sec.night .sub-h h3{color:#F1ECE2}
+.sec.night .sub-h .k{color:#8C867A}
+.sh{display:grid;grid-template-columns:1.35fr .65fr;gap:40px;align-items:end;margin-bottom:46px}
+.sh .no{font-family:var(--serif);font-size:96px;font-weight:900;line-height:.8;color:rgba(26,25,21,.1);letter-spacing:-.03em}
+.sh h2{font-family:var(--serif);font-weight:900;font-size:clamp(34px,4.2vw,54px);line-height:1.12;letter-spacing:-.012em;margin-top:12px}
+.sh .lede{margin-top:16px;color:var(--ink2);font-size:15.5px;line-height:1.9;max-width:760px}
+.sh .side{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.sub-h{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:52px 0 20px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.sub-h h3{font-family:var(--serif);font-size:22px;font-weight:900;letter-spacing:-.01em}
+.sub-h .k{margin-left:auto}
+p.lead{color:var(--ink2);font-size:15px;line-height:1.9;max-width:840px}
+.sec.night p.lead{color:#BDB5A6}
+.sec.night p.lead b{color:#F1ECE2}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 26px;position:relative;overflow:hidden;transition:transform .35s,box-shadow .35s,border-color .35s}
+.card:hover{transform:translateY(-4px);border-color:#D3C8B6;box-shadow:0 26px 50px -34px rgba(60,40,20,.35)}
+.card .n{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--mute)}
+.card h4{font-family:var(--serif);font-size:19px;font-weight:900;line-height:1.4;margin-top:8px}
+.card p{font-size:13.8px;color:var(--ink2);line-height:1.8;margin-top:8px}
+.card.dark{background:var(--night2);border-color:#2B2823;color:#F1ECE2}
+.card.dark .n{color:#8C867A}
+.card.dark p{color:#BDB5A6}
+.card.edge{border-top:3px solid var(--acc)}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+
+/* tags + status */
+.tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:3px 9px;border-radius:999px;border:1px solid;white-space:nowrap}
+.tag.p0{color:var(--acc);border-color:var(--acc);background:var(--acc-soft)}
+.tag.p1{color:#94680F;border-color:var(--gold);background:var(--gold-soft)}
+.tag.p2{color:var(--mute);border-color:var(--line);background:#F1EDE4}
+.tag.ok{color:var(--ok);border-color:var(--ok2);background:var(--ok-soft)}
+.tag.live::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 1.6s infinite}
+.st{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:var(--mono);font-size:11px;font-weight:700;padding:4px 9px;border-radius:7px;white-space:nowrap}
+.st.y{background:var(--ok-soft);color:var(--ok)}
+.st.p{background:var(--gold-soft);color:#8A6316}
+.st.n{background:var(--acc-soft);color:var(--acc)}
+.st.q{background:#EFEBE2;color:var(--mute)}
+
+/* flow (proposition) */
+.flow{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:8px}
+.flow .step{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 14px;position:relative;transition:transform .3s,border-color .3s}
+.flow .step:hover{transform:translateY(-3px);border-color:var(--acc)}
+.flow .step .s{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--acc);font-weight:700;text-transform:uppercase}
+.flow .step .t{font-size:14px;color:var(--ink);margin-top:6px;line-height:1.45;font-weight:700}
+.flow .step:not(:last-child)::after{content:"→";position:absolute;right:-11px;top:50%;transform:translateY(-50%);color:var(--mute);font-size:13px;z-index:2}
+
+/* comparison table */
+.cmp{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:6px}
+.cmp table{border-collapse:collapse;width:100%;min-width:660px}
+.cmp th,.cmp td{padding:13px 16px;text-align:left;border-top:1px solid var(--line2);font-size:13.5px;vertical-align:middle}
+.cmp thead th{background:#F7F3EB;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--ink2);text-transform:uppercase;font-weight:700}
+.cmp thead th.us{color:var(--acc)}
+.cmp tbody tr:first-child td{border-top:none}
+.cmp tbody tr:hover td{background:#FCF9F2}
+.cmp td.us{background:var(--acc-soft)}
+.cmp td.feat{font-weight:700;color:var(--ink)}
+
+/* tree */
+.tree-card{background:var(--night2);border:1px solid #2B2823;border-radius:16px;overflow:hidden}
+.tree-card .hd{display:flex;align-items:center;gap:10px;padding:13px 20px;background:rgba(255,255,255,.03);border-bottom:1px solid #2B2823;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:#8C867A;text-transform:uppercase}
+.tree-card .hd .d{width:8px;height:8px;border-radius:50%;background:var(--acc2)}
+.tree{font-family:var(--mono);font-size:13.5px;line-height:2;padding:20px 22px;color:#BDB5A6;overflow-x:auto;white-space:pre}
+.tree .k{color:var(--acc2);font-weight:700}
+.tree .f{color:#D8D2C6}
+
+/* arch stack */
+.arch{display:flex;flex-direction:column;gap:12px;margin-top:6px}
+.arch .layer{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 22px;display:grid;grid-template-columns:200px 1fr;gap:20px;align-items:center;transition:transform .3s,border-color .3s}
+.arch .layer:hover{transform:translateX(5px);border-color:var(--acc)}
+.arch .layer .lh{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--acc);letter-spacing:.08em;text-transform:uppercase}
+.arch .layer .lb{font-size:14px;color:var(--ink2);line-height:1.7}
+.arch .layer.bridge{border-style:dashed;background:#FBF6EC}
+.arch .layer.opt{background:linear-gradient(90deg,var(--acc-soft),transparent);border-color:var(--acc)}
+
+/* horizontal timeline */
+.tl{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 26px 22px;overflow:hidden;margin-top:6px}
+.tl-scroll{overflow-x:auto;scrollbar-width:thin}
+.tl-in{position:relative;min-width:1040px}
+.tl-scale{position:relative;height:26px;border-bottom:1px solid var(--line2)}
+.tl-scale span{position:absolute;transform:translateX(-50%);font-family:var(--mono);font-size:11px;color:var(--mute);top:4px;white-space:nowrap}
+.tl-track{position:relative;height:196px;margin-top:16px}
+.tl-track .gl{position:absolute;top:-16px;bottom:0;width:1px;background:var(--line2)}
+.tl-now{position:absolute;top:-16px;bottom:0;width:2px;background:var(--acc);opacity:.55;z-index:3}
+.tl-now i{position:absolute;top:-30px;left:50%;transform:translateX(-50%);font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--acc);border:1px solid var(--acc);border-radius:999px;background:var(--card);padding:1px 8px;white-space:nowrap}
+.tl-item{position:absolute;z-index:4;transform:translateX(-50%);width:max-content;max-width:200px}
+.tl-item .in{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;box-shadow:0 10px 22px -18px rgba(60,40,20,.45);transition:.25s}
+.tl-item .in:hover{border-color:#CFC3AF;transform:translateY(-2px);box-shadow:0 16px 28px -18px rgba(60,40,20,.5)}
+.tl-item .d{font-family:var(--mono);font-size:10px;color:var(--mute);letter-spacing:.05em}
+.tl-item .t{font-size:12.5px;font-weight:700;line-height:1.45;margin-top:2px}
+.tl-item .p{font-size:11px;color:var(--ink2);line-height:1.5;margin-top:3px}
+.tl-item.acc .in{border-color:var(--acc);background:#FFF8F3}
+.tl-item.acc .d{color:var(--acc)}
+.tl-item.gold .in{border-color:var(--gold);background:#FFFBF1}
+.tl-item.gold .d{color:#94680F}
+.tl-item.ok .in{border-color:var(--ok2);background:#F4FAF7}
+.tl-item.ok .d{color:var(--ok)}
+.tl-item::after{content:"";position:absolute;left:50%;bottom:-9px;width:7px;height:7px;border-radius:50%;background:var(--ink);transform:translateX(-50%);box-shadow:0 0 0 3px var(--card)}
+.tl-item.acc::after{background:var(--acc)}
+.tl-item.gold::after{background:var(--gold)}
+.tl-item.ok::after{background:var(--ok2)}
+
+/* metrics checks */
+.checks{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px}
+.checks .ck{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 18px}
+.checks .ck .no{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--acc);flex:none;width:26px}
+.checks .ck .tx{font-size:13.8px;color:var(--ink2);line-height:1.7}
+
+/* footer */
+footer{background:var(--night);color:#8C867A;padding:44px 0;margin-top:0}
+footer .fg{display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:center}
+footer .fb{font-family:var(--serif);font-size:22px;font-weight:900;color:#F1ECE2}
+footer p{font-size:12.5px;line-height:1.8}
+footer .mono{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#6E685D}
+
+@media(max-width:900px){
+  .wrap{padding:0 22px}
+  .hero{padding-top:96px}
+  .hero-grid{grid-template-columns:1fr}
+  .hero-art{justify-self:start;margin-top:8px}
+  .north .wrap{grid-template-columns:repeat(2,1fr)}
+  .north .it:nth-child(3){border-left:none;padding-left:0}
+  .sh{grid-template-columns:1fr;gap:16px}
+  .sh .no{font-size:64px}
+  .grid2,.grid3,.grid4{grid-template-columns:1fr}
+  .flow{grid-template-columns:repeat(2,1fr)}
+  .flow .step::after{display:none}
+  .arch .layer{grid-template-columns:1fr;gap:6px}
+  .checks{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+
+<nav class="top"><div class="in" id="navin">
+  <a href="#s1"><span class="n">01</span>摘要</a>
+  <a href="#s2"><span class="n">02</span>问题</a>
+  <a href="#s3"><span class="n">03</span>命题</a>
+  <a href="#s4"><span class="n">04</span>定位</a>
+  <a href="#s5"><span class="n">05</span>目标</a>
+  <a href="#s6"><span class="n">06</span>概念</a>
+  <a href="#s7"><span class="n">07</span>机制</a>
+  <a href="#s8"><span class="n">08</span>信任</a>
+  <a href="#s9"><span class="n">09</span>架构</a>
+  <a href="#s10"><span class="n">10</span>路线</a>
+  <a href="#s11"><span class="n">11</span>度量</a>
+  <a href="#s12"><span class="n">12</span>风险</a>
+  <a href="#s13"><span class="n">13</span>结论</a>
+</div></nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="grid-bg"></div>
+  <canvas id="stars"></canvas>
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow rv"><i></i>Local-First · 个人资产沉淀系统</div>
+        <h1 class="rv d1">把完整的你，<br>装进<span class="g">一艘不沉的方舟。</span></h1>
+        <p class="sub rv d2">OneArk 以<b>会议、笔记与日常材料</b>为入口，在你控制的本地空间里，把工作、学习、创作与生活中转瞬即逝的内容，沉淀为可验证、可关联、可迁移、完全归属你的个人资产。不建封闭的「第二大脑」，而给你一个能理解、修订、备份、迁移与导出的空间。</p>
+        <div class="meta rv d3">
+          <div><b>个人</b>资产归属 · 归你所有</div>
+          <div><b>本地</b>Local-first 默认本地处理</div>
+          <div><b>可迁移</b>一舟承载 · 整船带走</div>
+          <div><b>AGPLv3</b>开源许可</div>
+        </div>
+      </div>
+      <div class="hero-art rv d2">
+        <svg viewBox="0 0 260 176" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="方舟与进度仪表">
+          <defs>
+            <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#E8693A"/><stop offset=".6" stop-color="#E0A84A"/><stop offset="1" stop-color="#F1ECE2"/>
+            </linearGradient>
+          </defs>
+          <path d="M40 128 A68 68 0 1 1 220 128" stroke="rgba(244,238,227,.12)" stroke-width="10" stroke-linecap="round"/>
+          <path d="M40 128 A68 68 0 1 1 220 128" stroke="url(#gg)" stroke-width="10" stroke-linecap="round" stroke-dasharray="328" stroke-dashoffset="60"/>
+          <g stroke="rgba(244,238,227,.28)" stroke-width="2">
+            <line x1="130" y1="34" x2="130" y2="44"/>
+            <line x1="66" y1="60" x2="73" y2="67"/>
+            <line x1="194" y1="60" x2="187" y2="67"/>
+            <line x1="40" y1="128" x2="50" y2="128"/>
+            <line x1="220" y1="128" x2="210" y2="128"/>
+          </g>
+          <path d="M130 92 L130 122 M130 96 L112 122 L130 122 M130 104 L148 122 L130 122" stroke="#F1ECE2" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <text class="gauge-num" x="130" y="150" text-anchor="middle" font-size="15" font-weight="700" fill="#F1ECE2">ONE·ARK</text>
+        </svg>
+        <div class="hstat">
+          <div><span class="d acc"></span>资产归属<b>个人</b><em>100%</em></div>
+          <div><span class="d gold"></span>一舟承载<b>全部的你</b><em>READY</em></div>
+          <div><span class="d ok"></span>证据可溯<b>强溯源</b><em>ON</em></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="north">
+    <div class="wrap">
+      <div class="it"><div class="lab"><span>本地优先</span><span>LOCAL</span></div><div class="val"><span class="now">100%</span><span class="to">默认本地处理</span></div><div class="trk"><i data-w="100%"></i></div></div>
+      <div class="it"><div class="lab"><span>资产归属</span><span>OWN</span></div><div class="val"><span class="now">个人</span><span class="tgt">可迁移导出</span></div><div class="trk"><i data-w="100%"></i></div></div>
+      <div class="it"><div class="lab"><span>高频入口</span><span>ENTRY</span></div><div class="val"><span class="now">会议·笔记</span><span class="tgt">资产沉淀</span></div><div class="trk"><i data-w="30%"></i></div></div>
+      <div class="it"><div class="lab"><span>演进路线</span><span>ROADMAP</span></div><div class="val"><span class="now">P0</span><span class="tgt">→ P5</span></div><div class="trk"><i data-w="18%"></i></div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ 01 摘要 ============ -->
+<section class="sec" id="s1">
+  <div class="wrap">
+    <div class="sh rv">
+      <div><div class="no">01</div><h2>摘要与核心价值</h2><p class="lede">每个人每天在会议、笔记、学习、创作与生活中产生大量材料，却散落在企业系统、聊天工具与临时文件里。它们帮组织完成当下工作，却难以沉淀为个人可迁移、可复用、可持续增长的资产。OneArk 把「原始证据、人工确认、资产可迁移」置于中心，而非把 AI 对话置于中心。</p></div>
+      <div class="side"><span class="tag live">ABSTRACT</span><span class="tag ok">v0.2 讨论稿</span></div>
+    </div>
+    <div class="card edge rv d1" style="max-width:840px">
+      <div class="n">ONE-LINER · 一句话定位</div>
+      <h4 style="font-size:22px;margin-top:10px">每一次记录，都不应只变成一条转瞬即逝的笔记，而应沉淀为一组<span class="acc">可验证、可关联、可迁移</span>的个人资产。</h4>
+      <p>以会议、笔记与日常材料为入口，在本地项目空间中保存原始材料，通过转写、结构化、检索与生成，把一次性内容转化为可持续积累的个人资产。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 问题 ============ -->
+<section class="sec" id="s2">
+  <div class="wrap">
+    <div class="sh rv">
+      <div><div class="no">02</div><h2>我们要解决什么问题</h2><p class="lede">问题不是「如何再做一个聊天界面」，而是：如何让个人内容在不牺牲隐私与可迁移性的前提下，被可靠地保存、理解、检索与再次生产。</p></div>
+      <div class="side"><span class="tag live">PROBLEM</span></div>
+    </div>
+    <div class="grid3">
+      <div class="card rv"><div class="n">TEMPORAL · 01</div><h4>信息的短暂性</h4><p>会议、讨论、灵感与学习结束后，往往只留零散记忆与不稳定的记录。素材缺检索、缺关系——任务、决策、知识之间从未被连起来。</p></div>
+      <div class="card rv d1"><div class="n">MISMATCH · 02</div><h4>个人资产与平台错位</h4><p>企业系统与云端工具服务当下流程，未必服务个人长期发展。换团队、离职或迁工具后，参与形成的经验与脉络可能无法继续使用。</p></div>
+      <div class="card rv d2"><div class="n">TRUST · 03</div><h4>生成式 AI 的信任问题</h4><p>用户常无法控制：原始材料存哪、什么被发往模型、结果能否溯源、能否批量导出、供应商停服后资产是否仍可用。</p></div>
+    </div>
+    <div class="sub-h rv"><h3>用户的真实痛点</h3><span class="k">PAIN POINTS</span></div>
+    <div class="grid2">
+      <div class="card rv"><span class="tag p0">隐私</span><h4>本地隐私至上</h4><p>所有数据本地存储、不上云，把日常材料长期沉淀为个人资产。</p></div>
+      <div class="card rv d1"><span class="tag p1">沉淀</span><h4>经历与成长沉淀</h4><p>内容和个人成长需要被长期保留，而非用完即弃。</p></div>
+      <div class="card rv"><span class="tag ok">迁移</span><h4>可迁移的经历</h4><p>经验与成长过程属于个人，离职或换工具后不应断层、丢失。</p></div>
+      <div class="card rv d1"><span class="tag p2">归属</span><h4>资产归属清晰</h4><p>资产是个人的，不是任何平台的；能随时打包带走。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 命题（深色） ============ -->
+<section class="sec night" id="s3">
+  <div class="wrap">
+    <div class="sh rv">
+      <div><div class="no">03</div><h2>产品命题</h2><p class="lede">每一次记录，都应沉淀为一组可验证、可关联、可迁移的个人资产。AI 的作用是降低整理与生成成本，而不是替用户决定什么是真实事实、什么应当进入长期记忆。</p></div>
+      <div class="side"><span class="tag live" style="color:#E8693A;border-color:#E8693A;background:rgba(232,105,58,.14)">PROPOSITION</span></div>
+    </div>
+    <div class="flow">
+      <div class="step rv"><div class="s">Capture</div><div class="t">原始材料</div></div>
+      <div class="step rv d1"><div class="s">Transcribe</div><div class="t">转写 / 解析</div></div>
+      <div class="step rv d1"><div class="s">Human</div><div class="t">可修订文本</div></div>
+      <div class="step rv d2"><div class="s">Extract</div><div class="t">决策·任务·主题·关系</div></div>
+      <div class="step rv d2"><div class="s">Retrieve</div><div class="t">可检索知识资产</div></div>
+      <div class="step rv d3"><div class="s">Produce</div><div class="t">日报·周报·PPT·HTML</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 定位 ============ -->
+<section class="sec" id="s4">
+  <div class="wrap">
+    <div class="sh rv">
+      <div><div class="no">04</div><h2>差异化定位 · 对照 Meetily</h2><p class="lede">Meetily 是成熟的本地优先会议助手（Community 开源 / Pro 闭源增值），强在会议转写本身。OneArk 沿用其本地录音、本地 ASR 与基础摘要，但把视野从「会议」拉到「完整的个人」——以原生个人资产库、职业画像与分层记忆、MCP 生态、一键多格式产物与全套资产迁移为差异点。</p></div>
+      <div class="side"><span class="tag live">POSITIONING</span><span class="tag p0">杀手锏：资产打包迁移</span></div>
+    </div>
+    <div class="cmp rv d1">
+      <table>
+        <thead><tr><th>能力</th><th>Meetily Community<span class="muted"> · MIT</span></th><th>Meetily Pro<span class="muted"> · 闭源</span></th><th class="us">OneArk · AGPLv3</th></tr></thead>
+        <tbody>
+          <tr><td class="feat">本地录音 + VAD 降噪</td><td><span class="st y">✓</span></td><td><span class="st y">✓</span></td><td class="us"><span class="st y">✓</span></td></tr>
+          <tr><td class="feat">Whisper / Parakeet 本地 ASR</td><td><span class="st y">✓</span></td><td><span class="st y">✓</span></td><td class="us"><span class="st y">✓</span></td></tr>
+          <tr><td class="feat">基础 AI 摘要、提取待办</td><td><span class="st y">✓</span></td><td><span class="st y">✓</span></td><td class="us"><span class="st y">✓</span></td></tr>
+          <tr><td class="feat">本地说话人分离 diarization</td><td><span class="st n">✗</span></td><td><span class="st y">✓</span></td><td class="us"><span class="st p">计划内置</span></td></tr>
+          <tr><td class="feat">自定义摘要模板</td><td><span class="st n">✗</span></td><td><span class="st y">✓</span></td><td class="us"><span class="st y">岗位级模板</span></td></tr>
+          <tr><td class="feat">PDF / DOCX 导出</td><td><span class="st n">✗</span></td><td><span class="st y">✓</span></td><td class="us"><span class="st y">✓</span></td></tr>
+          <tr><td class="feat">BYOK 接入各大 LLM API</td><td><span class="st q">有限</span></td><td><span class="st y">✓</span></td><td class="us"><span class="st y">✓</span></td></tr>
+          <tr><td class="feat">Windows GPU 加速</td><td><span class="st n">✗</span></td><td><span class="st y">✓</span></td><td class="us"><span class="st y">✓</span></td></tr>
+          <tr><td class="feat">内置长期个人资产库</td><td><span class="st n">✗</span></td><td><span class="st n">仅计划推 Obsidian</span></td><td class="us"><span class="st y">原生内置</span></td></tr>
+          <tr><td class="feat">个人画像 · 分层长期记忆</td><td><span class="st n">✗</span></td><td><span class="st n">✗</span></td><td class="us"><span class="st y">核心亮点</span></td></tr>
+          <tr><td class="feat">跨域沉淀（工作/学习/创作/生活）</td><td><span class="st n">✗</span></td><td><span class="st n">✗</span></td><td class="us"><span class="st y">原生支持</span></td></tr>
+          <tr><td class="feat">MCP 协议 · 插件生态</td><td><span class="st n">✗</span></td><td><span class="st n">✗</span></td><td class="us"><span class="st y">原生支持</span></td></tr>
+          <tr><td class="feat">一键生成 PPT / Mermaid / HTML</td><td><span class="st n">✗</span></td><td><span class="st n">✗</span></td><td class="us"><span class="st y">✓</span></td></tr>
+          <tr><td class="feat">全套个人资产打包迁移导出</td><td><span class="st n">✗</span></td><td><span class="st n">✗</span></td><td class="us"><span class="st y">杀手锏</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 目标 ============ -->
+<section class="sec" id="s5">
+  <div class="wrap">
+    <div class="sh rv">
+      <div><div class="no">05</div><h2>设计目标与非目标</h2><p class="lede">先把边界划清楚：什么必须做到，什么第一阶段绝不做。克制本身就是产品力。</p></div>
+      <div class="side"><span class="tag live">GOALS</span></div>
+    </div>
+    <div class="grid2">
+      <div class="card edge rv"><div class="n">DESIGN GOALS · 要做到</div>
+        <h4>设计目标</h4>
+        <p style="margin-top:12px">
+          <span class="tag ok">资产归用户控制</span> <span class="tag ok">证据可追溯</span> <span class="tag ok">默认本地处理</span> <span class="tag ok">人工确认可介入</span> <span class="tag ok">渐进式智能化</span> <span class="tag ok">跨平台可用</span>
+        </p>
+        <p>项目数据可复制、备份、迁移与导出；派生内容能回到原始材料；不依赖云端也能捕获、保存与基础转写；用户可修订、确认任务、控制长期记忆写入；先保存检索、再引入 Agent；以 macOS 与 Windows 为第一批桌面目标。</p>
+      </div>
+      <div class="card rv d1"><div class="n">NON-GOALS · 不做</div>
+        <h4>非目标（第一阶段）</h4>
+        <p style="margin-top:12px">
+          <span class="tag p2">通用 Agent 平台</span> <span class="tag p2">知识图谱替代全文检索</span> <span class="tag p2">所有调用过 Agent</span> <span class="tag p2">通用插件市场</span> <span class="tag p2">默认上云</span> <span class="tag p2">覆盖所有来源</span>
+        </p>
+        <p>在没有真实使用频率前，不引入通用插件、Agent 强制层、知识图谱或全平台覆盖——避免过早平台化带来的权限、数据与生命周期复杂度。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 概念 ============ -->
+<section class="sec" id="s6">
+  <div class="wrap">
+    <div class="sh rv">
+      <div><div class="no">06</div><h2>核心概念模型</h2><p class="lede">项目空间是用户可见、可复制的资产边界：结构化数据库 + 可读文件。会议、笔记与导入的材料都进入同一套 capture 结构；SQLite 存实体、关系、索引与任务状态，原始文件落在文件系统，附件用相对路径，保证项目可整体移动。</p></div>
+      <div class="side"><span class="tag live">CONCEPT</span></div>
+    </div>
+    <div class="grid2" style="align-items:start">
+      <div class="tree-card rv">
+        <div class="hd"><span class="d"></span>Project Space · 项目空间结构</div>
+        <div class="tree"><span class="k">项目空间/</span>
+├── <span class="f">project.json</span>
+├── <span class="f">workspace.sqlite</span>
+├── <span class="k">capture/</span>
+│   └── <span class="f">item-id/</span>
+│       ├── <span class="f">metadata.json</span>
+│       ├── <span class="f">source.wav / source.md</span>
+│       ├── <span class="f">transcript.raw.json</span>
+│       └── <span class="f">transcript.edited.json</span>
+├── <span class="k">knowledge/</span>
+├── <span class="k">tasks/</span>
+└── <span class="k">exports/</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div class="card rv d1"><div class="n">DATA MODEL</div><h4>原始资产 vs 派生资产</h4><p><b>原始资产</b>：录音/原件、原始转写、模型版本、时间戳、导入文件。<b>派生资产</b>：修订文本、摘要、任务、标签、知识条目、对外产物。派生不可覆盖原始，并保存来源引用、模型配置与生成时间。</p></div>
+        <div class="card rv d2"><div class="n">CONFIDENCE</div><h4>事实 · 推断 · 建议</h4><p>区分材料直接提供的<b>事实</b>、提取的<b>结构化信息</b>、模型的<b>推断与建议</b>、用户确认后的<b>长期资产</b>。只有确认后的内容，才进入高置信度的长期知识或任务视图。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 机制 ============ -->
+<section class="sec" id="s7">
+  <div class="wrap">
+    <div class="sh rv">
+      <div><div class="no">07</div><h2>产品机制</h2><p class="lede">四大机制支撑资产沉淀闭环：捕获沉淀、知识沉淀、工作产物、Agent 编排。确定性能力由应用服务直接提供，Agent 只处理需规划与确认的任务。</p></div>
+      <div class="side"><span class="tag live">MECHANISM</span></div>
+    </div>
+    <div class="grid2">
+      <div class="card rv"><div class="n">M1 · 捕获与沉淀</div><h4>先捕获 · 后转写</h4><p>选择/创建项目 → 录音或导入 → 保存原始材料 → 后台转写/解析任务 → 本地模型处理 → 展示结果与时间戳 → 用户修订与确认。一期以会议为旗舰入口，不做实时转写，先验证资产闭环。</p></div>
+      <div class="card rv d1"><div class="n">M2 · 知识沉淀</div><h4>建议 + 确认</h4><p>会议、Markdown、文档与笔记进入知识空间，先给来源、标签、关联与全文检索。AI 可建议归类，但绝不在用户不知情时永久写入。</p></div>
+      <div class="card rv"><div class="n">M3 · 工作产物</div><h4>模板 · 字段 · 溯源</h4><p>产物优先从已确认资产生成。日报、周报、纪要、PPT、HTML、信息图、流程图是不同渲染目标，不混成一个不透明的 Agent 输出。</p></div>
+      <div class="card rv d1"><div class="n">M4 · Agent</div><h4>跨模块编排层</h4><p>Agent 不是底层数据与模型服务的替代品。它处理需规划、检索、多步工具调用与确认的任务，如据一周材料生成周报草稿并列出每条结论来源。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 08 信任（深色） ============ -->
+<section class="sec night" id="s8">
+  <div class="wrap">
+    <div class="sh rv">
+      <div><div class="no">08</div><h2>信任与隐私模型</h2><p class="lede">Local-first 不等于永远不联网：本地存储是默认路径、原始材料不要求先上传、本地转写可独立完成、远端模型由用户主动配置、外发内容与 endpoint 可见。</p></div>
+      <div class="side"><span class="tag live" style="color:#E8693A;border-color:#E8693A;background:rgba(232,105,58,.14)">TRUST &amp; PRIVACY</span></div>
+    </div>
+    <div class="grid3">
+      <div class="card dark rv"><div class="n">LOCAL-FIRST</div><h4>默认本地</h4><p>本地存储为默认路径；原始材料不要求先上传；本地转写可独立完成；远端模型必须由用户主动配置。</p></div>
+      <div class="card dark rv d1"><div class="n">CLOUD BOUNDARY</div><h4>云端边界透明</h4><p>明确提示发送的是原始转写还是修订文本、是否含音频、用哪个 provider、重试是否会再发、结果如何写回本地。API key 不作普通项目文件复制。</p></div>
+      <div class="card dark rv d2"><div class="n">PORTABILITY</div><h4>可迁移性</h4><p>不依赖在线服务即可取得原始材料、转写、元数据、知识条目、任务、产物及来源版本——方舟隐喻的落脚点：一舟承载，整船带走。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 09 架构 ============ -->
+<section class="sec" id="s9">
+  <div class="wrap">
+    <div class="sh rv">
+      <div><div class="no">09</div><h2>技术架构</h2><p class="lede">一期采用模块化单体，仅为稳定变化点定义接口：CaptureSource / TranscriptionProvider / ProjectStore / GenerationService / Exporter。底层高性能用 Go，上层可扩展用 Python 或 TypeScript，数据库用 SQLite。</p></div>
+      <div class="side"><span class="tag live">ARCHITECTURE</span></div>
+    </div>
+    <div class="arch">
+      <div class="layer rv"><div class="lh">表现层 · React / Vite</div><div class="lb">编辑器、设置、列表与状态呈现。不使用 Next.js 的 SSR——一期是本地桌面应用。</div></div>
+      <div class="layer bridge rv d1"><div class="lh">桥接 · Wails</div><div class="lb">连接 Go 后端与前端 WebView，承载桌面窗口与系统能力调用。</div></div>
+      <div class="layer rv d1"><div class="lh">应用服务层 · Go</div><div class="lb">项目空间、文件系统、SQLite、任务调度，以及 Python worker 的生命周期管理。</div></div>
+      <div class="layer rv d2"><div class="lh">推理层 · Python Worker</div><div class="lb">加载 faster-whisper 执行 ASR 转写，向 Go 输出进度、错误与结果；未来可扩展长驻 streaming worker 支持实时转写。</div></div>
+      <div class="layer opt rv d2"><div class="lh">可选 · 远端 LLM</div><div class="lb">摘要、抽取、生成可经 BYOK 接入各大 LLM API；外发内容、provider 与 endpoint 对用户透明可见。插件 / MCP / A2A 待权限与审计模型明确后再开放。</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10 路线 ============ -->
+<section class="sec" id="s10">
+  <div class="wrap">
+    <div class="sh rv">
+      <div><div class="no">10</div><h2>产品分期与演进路线</h2><p class="lede">路线不是功能清单，而是依赖关系：先验证最难的事实，再逐步叠加价值。四阶段面向产品，P0–P5 面向技术可行性递进。</p></div>
+      <div class="side"><span class="tag live">ROADMAP</span></div>
+    </div>
+    <div class="sub-h rv"><h3>四阶段产品分期</h3><span class="k">PRODUCT PHASES</span></div>
+    <div class="grid4">
+      <div class="card rv"><span class="tag p0">S1</span><h4>捕获与转写</h4><p>会议/笔记收音、降噪、音频转文字、ASR 纠错优化。</p></div>
+      <div class="card rv d1"><span class="tag p1">S2</span><h4>个人资产库</h4><p>基于沉淀打造知识库；待办、收藏、本周主线；Agent 自动记录。</p></div>
+      <div class="card rv d2"><span class="tag ok">S3</span><h4>个人 Agent</h4><p>会话 Agent；画像 + 记忆；生成汇报 / PPT / HTML / 图；MCP / A2A。</p></div>
+      <div class="card rv d3"><span class="tag p2">S4</span><h4>增强 · PRO</h4><p>热点追踪、转写增强、更强记忆图谱、云存储收费、定制硬件。</p></div>
+    </div>
+    <div class="sub-h rv"><h3>技术演进路线（P0–P5）</h3><span class="k">DEPENDENCY CHAIN</span></div>
+    <div class="tl rv d1">
+      <div class="tl-scroll">
+        <div class="tl-in">
+          <div class="tl-scale">
+            <span style="left:6%">P0</span><span style="left:24%">P1</span><span style="left:42%">P2</span><span style="left:60%">P3</span><span style="left:78%">P4</span><span style="left:95%">P5</span>
+          </div>
+          <div class="tl-track">
+            <div class="gl" style="left:6%"></div><div class="gl" style="left:24%"></div><div class="gl" style="left:42%"></div><div class="gl" style="left:60%"></div><div class="gl" style="left:78%"></div><div class="gl" style="left:95%"></div>
+            <div class="tl-now" style="left:6%"><i>当前 · P0</i></div>
+            <div class="tl-item acc" style="left:6%;top:0"><div class="in"><div class="d">P0 · 技术可行性</div><div class="t">验证最难的事实</div><div class="p">录音权限、材料保存、项目空间、worker 打包、长音频与失败恢复。</div></div></div>
+            <div class="tl-item" style="left:24%;top:96px"><div class="in"><div class="d">P1 · 沉淀闭环</div><div class="t">最小价值闭环</div><div class="p">创建项目、捕获、批量转写、修订、搜索并导出。</div></div></div>
+            <div class="tl-item gold" style="left:42%;top:0"><div class="in"><div class="d">P2 · 检索与确认</div><div class="t">个人资产空间</div><div class="p">导入、全文检索、来源标签、关联、确认后结构化抽取。</div></div></div>
+            <div class="tl-item" style="left:60%;top:96px"><div class="in"><div class="d">P3 · 工作产物</div><div class="t">资产变产物</div><div class="p">日报 / 周报 / 纪要 / 汇报模板，多格式可编辑可导出。</div></div></div>
+            <div class="tl-item ok" style="left:78%;top:0"><div class="in"><div class="d">P4 · 个人 Agent 编排</div><div class="t">受控自动化</div><div class="p">检索资产、调用工具、生成草稿、多步工作流，高影响需确认。</div></div></div>
+            <div class="tl-item" style="left:95%;top:96px"><div class="in"><div class="d">P5 · 同步 / 生态 / 商业化</div><div class="t">规模化</div><div class="p">热点追踪、云同步、团队、高级记忆、硬件与 Pro 模型。</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11 度量 ============ -->
+<section class="sec" id="s11">
+  <div class="wrap">
+    <div class="sh rv">
+      <div><div class="no">11</div><h2>如何衡量成功</h2><p class="lede">不以「支持多少模型或协议」衡量，而以沉淀闭环是否可信衡量。</p></div>
+      <div class="side"><span class="tag live">METRICS</span></div>
+    </div>
+    <div class="checks">
+      <div class="ck rv"><div class="no">01</div><div class="tx">用户能在短时间内完成一次捕获并找到对应转写。</div></div>
+      <div class="ck rv"><div class="no">02</div><div class="tx">长音频与异常中断不会导致资产丢失。</div></div>
+      <div class="ck rv d1"><div class="no">03</div><div class="tx">原始内容、修订内容与生成内容可以区分。</div></div>
+      <div class="ck rv d1"><div class="no">04</div><div class="tx">用户可以按关键词、来源与项目回溯内容。</div></div>
+      <div class="ck rv d2"><div class="no">05</div><div class="tx">项目目录可以备份、移动与导出。</div></div>
+      <div class="ck rv d2"><div class="no">06</div><div class="tx">用户清楚知道哪些内容被发送到远端模型。</div></div>
+      <div class="ck rv d3"><div class="no">07</div><div class="tx">生成产物能够回到具体来源，而不是只能相信模型。</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 12 风险 ============ -->
+<section class="sec" id="s12">
+  <div class="wrap">
+    <div class="sh rv">
+      <div><div class="no">12</div><h2>主要风险</h2><p class="lede">提前识别并设防，避免在错误的方向上过度投入。</p></div>
+      <div class="side"><span class="tag live">RISKS</span></div>
+    </div>
+    <div class="grid4">
+      <div class="card rv"><span class="tag p0">中</span><h4>跨平台捕获差异</h4><p>macOS 与 Windows 权限、系统音频与设备行为不同，先固定一期支持的来源与录音范围。</p></div>
+      <div class="card rv d1"><span class="tag p1">中</span><h4>模型质量与成本</h4><p>本地模型带来体积、CPU/GPU、首启与版本管理问题；按需下载并记录版本，结果溯源到模型配置。</p></div>
+      <div class="card rv d2"><span class="tag p0">高</span><h4>过早平台化</h4><p>通用插件、Agent、MCP、A2A 与知识图谱会扩大复杂度，应在 P1/P2 形成真实使用频率后再引入。</p></div>
+      <div class="card rv d3"><span class="tag p1">高</span><h4>许可证与模型权利</h4><p>发布前逐项审核桌面框架、FFmpeg、模型权重、推理库与前端依赖的许可及再分发条件。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 13 结论（深色） ============ -->
+<section class="sec night" id="s13">
+  <div class="wrap">
+    <div class="sh rv">
+      <div><div class="no">13</div><h2>结论与承诺</h2><p class="lede">长期价值不在于堆砌最多 AI 功能，而在于建立可信的个人资产底座：原始材料被保存，派生结果可追溯，用户拥有确认权，项目可以迁移。</p></div>
+      <div class="side"><span class="tag live" style="color:#E8693A;border-color:#E8693A;background:rgba(232,105,58,.14)">CONCLUSION</span></div>
+    </div>
+    <div class="card dark rv d1" style="max-width:840px">
+      <div class="n">THE PROMISE · 可验证的承诺</div>
+      <h4 style="font-size:24px;line-height:1.5;margin-top:12px">把每一次记录，<span style="background:linear-gradient(94deg,#E8693A,#E0A84A);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">可靠地沉淀为属于你自己的个人资产。</span></h4>
+      <p>当这个承诺被真实用户反复验证，个人资产库、工作台、Agent、MCP / A2A 与内容生产能力才有稳定的数据基础与产品理由——而这一切，都装载在属于你自己的方舟里。</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap fg">
+    <div><div class="fb">OneArk</div><p class="mono" style="margin-top:6px">Local-first · 资产归你 · 一舟承载完整的你</p></div>
+    <p style="text-align:right">产品白皮书 v0.2 讨论稿<br>由「个人工作资产系统」升级为「个人资产沉淀系统」 · AGPLv3</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* progress bar */
+  var bar=document.getElementById("bar");
+  var nav=document.querySelector("nav.top");
+  function onScroll(){
+    var h=document.documentElement, st=h.scrollTop||document.body.scrollTop;
+    var max=h.scrollHeight-h.clientHeight;
+    bar.style.width=(max>0?(st/max*100):0)+"%";
+    nav.classList.toggle("show", st>240);
+  }
+  document.addEventListener("scroll",onScroll,{passive:true}); onScroll();
+
+  /* reveal */
+  var revs=[].slice.call(document.querySelectorAll(".rv"));
+  if(reduced || !("IntersectionObserver" in window)){
+    revs.forEach(function(el){el.classList.add("in");});
+  }else{
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target);} });
+    },{rootMargin:"0px 0px -8% 0px",threshold:0.1});
+    revs.forEach(function(el){io.observe(el);});
+  }
+
+  /* north-strip bars animate in */
+  setTimeout(function(){
+    document.querySelectorAll(".north .trk i").forEach(function(i){ i.style.width=i.getAttribute("data-w"); });
+  },500);
+
+  /* active nav link */
+  var links=[].slice.call(document.querySelectorAll("nav.top a"));
+  var secs=links.map(function(a){return document.getElementById(a.getAttribute("href").slice(1));}).filter(Boolean);
+  function setActive(id){
+    links.forEach(function(l){
+      l.classList.toggle("on", l.getAttribute("href")==="#"+id);
+    });
+  }
+  if("IntersectionObserver" in window){
+    var so=new IntersectionObserver(function(es){
+      var vis=es.filter(function(e){return e.isIntersecting;})
+                 .sort(function(a,b){return a.boundingClientRect.top-b.boundingClientRect.top;});
+      if(vis.length) setActive(vis[0].target.id);
+    },{rootMargin:"-20% 0px -70% 0px",threshold:0});
+    secs.forEach(function(s){so.observe(s);});
+  }
+  links.forEach(function(a){
+    a.addEventListener("click",function(){
+      links.forEach(function(l){l.classList.remove("on");}); a.classList.add("on");
+    });
+  });
+
+  /* starfield */
+  var cv=document.getElementById("stars");
+  if(cv && !reduced){
+    var ctx=cv.getContext("2d"), W,H,stars=[],DPR=Math.min(window.devicePixelRatio||1,2);
+    function size(){ var r=cv.getBoundingClientRect(); W=r.width;H=r.height; cv.width=W*DPR;cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); build(); }
+    function build(){ stars=[]; var n=Math.round(W*H/16000); for(var i=0;i<n;i++){ stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.3+.3,a:Math.random(),s:Math.random()*.02+.005}); } }
+    function draw(){ ctx.clearRect(0,0,W,H); for(var i=0;i<stars.length;i++){ var s=stars[i]; s.a+=s.s; if(s.a>1||s.a<0){s.s*=-1;} var o=.25+Math.abs(Math.sin(s.a*Math.PI))*.5; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,6.283); ctx.fillStyle="rgba(241,236,226,"+o.toFixed(3)+")"; ctx.fill(); } requestAnimationFrame(draw); }
+    size(); window.addEventListener("resize",size); draw();
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "name": "@oneark/native",
+  "version": "0.1.0",
+  "private": true,
+  "napi": {
+    "binaryName": "oneark-native"
+  }
+}
